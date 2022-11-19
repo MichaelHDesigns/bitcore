@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var _ = require('lodash');
@@ -95,7 +98,7 @@ describe('Signature', function() {
 
   describe('#fromString', function() {
 
-    var buf =  Buffer.from('3044022075fc517e541bd54769c080b64397e32161c850f6c1b2b67a5c433affbb3e62770220729e85cc46ffab881065ec07694220e71d4df9b2b8c8fd12c3122cf3a5efbcf2', 'hex');
+    var buf = Buffer.from('3044022075fc517e541bd54769c080b64397e32161c850f6c1b2b67a5c433affbb3e62770220729e85cc46ffab881065ec07694220e71d4df9b2b8c8fd12c3122cf3a5efbcf2', 'hex');
 
     it('should parse this DER format signature in hex', function() {
       var sig = Signature.fromString(buf.toString('hex'));
@@ -113,7 +116,7 @@ describe('Signature', function() {
 
     it('should parse this known signature and rebuild it with updated zero-padded sighash types', function() {
       var original = '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e7201';
-      var buf =  Buffer.from(original, 'hex');
+      var buf = Buffer.from(original, 'hex');
       var sig = Signature.fromTxFormat(buf);
       sig.nhashtype.should.equal(Signature.SIGHASH_ALL);
       sig.set({
@@ -131,7 +134,7 @@ describe('Signature', function() {
   describe('#fromTxFormat', function() {
 
     it('should convert from this known tx-format buffer', function() {
-      var buf =  Buffer.from('30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e7201', 'hex');
+      var buf = Buffer.from('30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e7201', 'hex');
       var sig = Signature.fromTxFormat(buf);
       sig.r.toString().should.equal('63173831029936981022572627018246571655303050627048489594159321588908385378810');
       sig.s.toString().should.equal('4331694221846364448463828256391194279133231453999942381442030409253074198130');
@@ -238,7 +241,7 @@ describe('Signature', function() {
   describe('@isTxDER', function() {
     it('should know this is a DER signature', function() {
       var sighex = '3042021e17cfe77536c3fb0526bd1a72d7a8e0973f463add210be14063c8a9c37632022061bfa677f825ded82ba0863fb0c46ca1388dd3e647f6a93c038168b59d131a5101';
-      var sigbuf =  Buffer.from(sighex, 'hex');
+      var sigbuf = Buffer.from(sighex, 'hex');
       Signature.isTxDER(sigbuf).should.equal(true);
     });
 
@@ -282,22 +285,22 @@ describe('Signature', function() {
       var sig = new Signature({
         r: r,
         s: new BN('7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A1', 'hex')
-      });            
+      });
       sig.hasLowS().should.equal(false);
 
       var sig2 = new Signature({
         r: r,
         s: new BN('7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0', 'hex')
-      });      
+      });
       sig2.hasLowS().should.equal(true);
 
       var sig3 = new Signature({
         r: r,
         s: new BN(1)
-      });      
+      });
       sig3.hasLowS().should.equal(true);
 
-      var sig4 = new Signature({        
+      var sig4 = new Signature({
         r: r,
         s: new BN(0)
       });

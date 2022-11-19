@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var _ = require('lodash');
@@ -6,16 +9,20 @@ var BufferUtil = require('../util/buffer');
 var BufferReader = require('../encoding/bufferreader');
 var BufferWriter = require('../encoding/bufferwriter');
 var Hash = require('../crypto/hash');
-var JSUtil = require('../util/js');
 var Transaction = require('../transaction');
-var errors = require('../errors');
+var PartialMerkleTree = require('./PartialMerkleTree');
 var $ = require('../util/preconditions');
 
 /**
  * Instantiate a MerkleBlock from a Buffer, JSON object, or Object with
  * the properties of the Block
  *
- * @param {*} - A Buffer, JSON string, or Object representing a MerkleBlock
+ * @param {Buffer|string|{
+ *    header: BlockHeader|Object,
+ *    numTransactions: number,
+ *    hashes: string[],
+ *    flags: number[]
+ *  }} arg A Buffer, JSON string, or Object representing a MerkleBlock
  * @returns {MerkleBlock}
  * @constructor
  */
@@ -64,9 +71,28 @@ function MerkleBlock(arg) {
   _.extend(this,info);
   this._flagBitsUsed = 0;
   this._hashesUsed = 0;
-
   return this;
 }
+
+/**
+ * Builds merkle block from block header, transaction hashes and filter matches
+ * @param {BlockHeader|Object} header
+ * @param {Buffer[]} transactionHashes
+ * @param {boolean[]} filterMatches
+ * @return {MerkleBlock}
+ */
+MerkleBlock.build = function build(header, transactionHashes, filterMatches) {
+  var partialTree = new PartialMerkleTree({
+    transactionHashes: transactionHashes,
+    filterMatches: filterMatches
+  });
+  return new MerkleBlock({
+    header: header,
+    numTransactions: partialTree.totalTransactions,
+    hashes: partialTree.merkleHashes,
+    flags: partialTree.merkleFlags
+  });
+};
 
 /**
  * @param {Buffer} - MerkleBlock data in a Buffer object
@@ -152,52 +178,18 @@ MerkleBlock.prototype.validMerkleTree = function validMerkleTree() {
 };
 
 /**
- * Return a list of all the txs hash that match the filter
- * @returns {Array} - txs hash that match the filter
- */
-MerkleBlock.prototype.filterdTxsHash = function filterdTxsHash() {
-  $.checkState(_.isArray(this.flags), 'MerkleBlock flags is not an array');
-  $.checkState(_.isArray(this.hashes), 'MerkleBlock hashes is not an array');
-
-  // Can't have more hashes than numTransactions
-  if(this.hashes.length > this.numTransactions) {
-    throw new errors.MerkleBlock.InvalidMerkleTree();
-  }
-
-  // Can't have more flag bits than num hashes
-  if(this.flags.length * 8 < this.hashes.length) {
-    throw new errors.MerkleBlock.InvalidMerkleTree();
-  }
-
-  // If there is only one hash the filter do not match any txs in the block
-  if(this.hashes.length === 1) {
-    return [];
-  };
-
-  var height = this._calcTreeHeight();
-  var opts = { hashesUsed: 0, flagBitsUsed: 0 };
-  var txs = this._traverseMerkleTree(height, 0, opts, true);
-  if(opts.hashesUsed !== this.hashes.length) {
-    throw new errors.MerkleBlock.InvalidMerkleTree();
-  }
-  return txs;
-};
-
-/**
- * Traverse a the tree in this MerkleBlock, validating it along the way
+ * Traverse the tree in this MerkleBlock, validating it along the way
  * Modeled after Bitcoin Core merkleblock.cpp TraverseAndExtract()
- * @param {Number} - depth - Current height
- * @param {Number} - pos - Current position in the tree
- * @param {Object} - opts - Object with values that need to be mutated throughout the traversal
- * @param {Boolean} - checkForTxs - if true return opts.txs else return the Merkle Hash
- * @param {Number} - opts.flagBitsUsed - Number of flag bits used, should start at 0
- * @param {Number} - opts.hashesUsed - Number of hashes used, should start at 0
- * @param {Array} - opts.txs - Will finish populated by transactions found during traversal that match the filter
+ * @param {Number} depth - Current height
+ * @param {Number} pos - Current position in the tree
+ * @param {Object} [opts] - Object with values that need to be mutated throughout the traversal
+ * @param {Number} [opts.flagBitsUsed] - Number of flag bits used, should start at 0
+ * @param {Number} [opts.hashesUsed] - Number of hashes used, should start at 0
+ * @param {Array} [opts.txs] - Will finish populated by transactions found during traversal
  * @returns {Buffer|null} - Buffer containing the Merkle Hash for that height
- * @returns {Array} - transactions found during traversal that match the filter
  * @private
  */
-MerkleBlock.prototype._traverseMerkleTree = function traverseMerkleTree(depth, pos, opts, checkForTxs) {
+MerkleBlock.prototype._traverseMerkleTree = function traverseMerkleTree(depth, pos, opts) {
   /* jshint maxcomplexity:  12*/
   /* jshint maxstatements: 20 */
 
@@ -205,7 +197,6 @@ MerkleBlock.prototype._traverseMerkleTree = function traverseMerkleTree(depth, p
   opts.txs = opts.txs || [];
   opts.flagBitsUsed = opts.flagBitsUsed || 0;
   opts.hashesUsed = opts.hashesUsed || 0;
-  var checkForTxs = checkForTxs || false;
 
   if(opts.flagBitsUsed > this.flags.length * 8) {
     return null;
@@ -226,17 +217,13 @@ MerkleBlock.prototype._traverseMerkleTree = function traverseMerkleTree(depth, p
     if(pos*2+1 < this._calcTreeWidth(depth-1)) {
       right = this._traverseMerkleTree(depth-1, pos*2+1, opts);
     }
-    if (checkForTxs){
-      return opts.txs;
-    } else {
-      return Hash.sha256sha256(new Buffer.concat([left, right]));
-    };
+    return Hash.sha256sha256(Buffer.concat([left, right]));
   }
 };
 
 /** Calculates the width of a merkle tree at a given height.
  *  Modeled after Bitcoin Core merkleblock.h CalcTreeWidth()
- * @param {Number} - Height at which we want the tree width
+ * @param {Number} height Height at which we want the tree width
  * @returns {Number} - Width of the tree at a given height
  * @private
  */
@@ -258,7 +245,17 @@ MerkleBlock.prototype._calcTreeHeight = function calcTreeHeight() {
 };
 
 /**
- * @param {Transaction|String} - Transaction or Transaction ID Hash
+ * @return {string[]}
+ */
+MerkleBlock.prototype.getMatchedTransactionHashes = function getMatchedTransactionHashes() {
+  var txs = [];
+  var height = this._calcTreeHeight();
+  this._traverseMerkleTree(height, 0, { txs: txs });
+  return txs;
+};
+
+/**
+ * @param {Transaction|String} tx Transaction or Transaction ID Hash
  * @returns {Boolean} - return true/false if this MerkleBlock has the TX or not
  * @private
  */
@@ -273,9 +270,7 @@ MerkleBlock.prototype.hasTransaction = function hasTransaction(tx) {
     hash = BufferUtil.reverse(Buffer.from(tx.id, 'hex')).toString('hex');
   }
 
-  var txs = [];
-  var height = this._calcTreeHeight();
-  this._traverseMerkleTree(height, 0, { txs: txs });
+  var txs = this.getMatchedTransactionHashes();
   return txs.indexOf(hash) !== -1;
 };
 

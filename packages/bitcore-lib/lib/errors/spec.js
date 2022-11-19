@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var docsURL = 'http://bitcore.io/';
@@ -45,12 +48,64 @@ module.exports = [{
     'message': 'Invalid exchange rate: {0}'
   }]
 }, {
-  name: 'MerkleBlock',
-  message: 'Internal Error on MerkleBlock {0}',
-  errors: [{
-    'name': 'InvalidMerkleTree',
-    'message': 'This MerkleBlock contain an invalid Merkle Tree'
-  }]
+  name: 'GovObject',
+  message: 'Internal Error on GovObject {0}',
+  errors: [
+    {
+      name: 'Proposal',
+      message: 'Internal Error on Proposal {0}',
+      errors: [{
+        name: 'invalidDate',
+        message: 'Invalid Date'
+      }, {
+        name: 'invalidDateWindow',
+        message: 'Invalid Timespan'
+      }, {
+        name: 'invalidAddress',
+        message: 'Invalid Address'
+      },
+      {
+        name: 'invalidP2SHAddress',
+        message: 'Invalid P2SHAddress'
+      },
+      {
+        name: 'invalidPayment',
+        message: 'Invalid Payment Amount'
+      }, {
+        name: 'invalidUrl',
+        message: 'Invalid URL'
+      }, {
+        name: 'invalidName',
+        message: 'Invalid Name'
+      }]
+    },
+    {
+      name: 'Trigger',
+      message: 'Internal Error on Trigger {0}',
+      errors: [
+        {
+          name: 'invalidEBH',
+          message: 'Invalid Event Block Height'
+        },
+        {
+          name: 'fieldsMismatch',
+          message: 'Mismatched number of addresses / amounts / proposals'
+        },
+        {
+          name: 'invalidAddresses',
+          message: 'Invalid Payment Addresses'
+        },
+        {
+          name: 'invalidP2SHAddresses',
+          message: 'Invalid P2SH Payment Addresses'
+        },
+        {
+          name: 'invalidPaymentAmounts',
+          message: 'Invalid Payment Amounts'
+        },
+      ]
+    },
+  ]
 }, {
   name: 'Transaction',
   message: 'Internal Error on Transaction {0}',
@@ -66,14 +121,7 @@ module.exports = [{
     }, {
       name: 'MissingPreviousOutput',
       message: 'No previous output information.'
-    }, {
-      name: 'BlockHeightOutOfRange',
-      message: 'Block Height can only be between 0 and 65535'
-    } , {
-      name: 'LockTimeRange',
-      message: 'Seconds needs to be more that 0 and less that 33553920'
-    }
-    ]
+    }]
   }, {
     name: 'NeedMoreInfo',
     message: '{0}'
@@ -98,6 +146,12 @@ module.exports = [{
   }, {
     name: 'InvalidSatoshis',
     message: 'Output satoshis are invalid',
+  }, {
+    name: 'InvalidPayloadSize',
+    message: 'Transaction payload size is invalid',
+  }, {
+    name: 'SpecialTransactionTypeIsNotSet',
+    message: 'Special transaction type is not set',
   }, {
     name: 'FeeError',
     message: 'Internal Error on Fee {0}',
@@ -145,7 +199,7 @@ module.exports = [{
     message: 'Invalid derivation argument {0}, expected string, or number and boolean'
   }, {
     name: 'InvalidEntropyArgument',
-    message: 'Invalid entropy: must be an hexa string or binary buffer, got {0}',
+    message: 'Invalid entropy: must be a hex string or binary buffer, got {0}',
     errors: [{
       name: 'TooMuchEntropy',
       message: 'Invalid entropy: more than 512 bits is non standard, got "{0}"'

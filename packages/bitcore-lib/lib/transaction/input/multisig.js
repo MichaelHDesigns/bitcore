@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var _ = require('lodash');
@@ -17,18 +20,13 @@ var TransactionSignature = require('../signature');
 /**
  * @constructor
  */
-function MultiSigInput(input, pubkeys, threshold, signatures, opts) {
-  opts = opts || {};
+function MultiSigInput(input, pubkeys, threshold, signatures) {
   Input.apply(this, arguments);
   var self = this;
   pubkeys = pubkeys || input.publicKeys;
   threshold = threshold || input.threshold;
   signatures = signatures || input.signatures;
-  if (opts.noSorting) {
-    this.publicKeys = pubkeys
-  } else  {
-    this.publicKeys = _.sortBy(pubkeys, function(publicKey) { return publicKey.toString('hex'); });
-  }
+  this.publicKeys = _.sortBy(pubkeys, function(publicKey) { return publicKey.toString('hex'); });
   $.checkState(Script.buildMultisigOut(this.publicKeys, threshold).equals(this.output.script),
     'Provided public keys don\'t match to the provided output script');
   this.publicKeyIndex = {};
@@ -67,10 +65,9 @@ MultiSigInput.prototype._serializeSignatures = function() {
   });
 };
 
-MultiSigInput.prototype.getSignatures = function(transaction, privateKey, index, sigtype, hashData, signingMethod) {
+MultiSigInput.prototype.getSignatures = function(transaction, privateKey, index, sigtype) {
   $.checkState(this.output instanceof Output);
   sigtype = sigtype || Signature.SIGHASH_ALL;
-  signingMethod = signingMethod || 'ecdsa';
 
   var self = this;
   var results = [];
@@ -81,7 +78,7 @@ MultiSigInput.prototype.getSignatures = function(transaction, privateKey, index,
         prevTxId: self.prevTxId,
         outputIndex: self.outputIndex,
         inputIndex: index,
-        signature: Sighash.sign(transaction, privateKey, sigtype, index, self.output.script, signingMethod),
+        signature: Sighash.sign(transaction, privateKey, sigtype, index, self.output.script),
         sigtype: sigtype
       }));
     }
@@ -90,11 +87,11 @@ MultiSigInput.prototype.getSignatures = function(transaction, privateKey, index,
   return results;
 };
 
-MultiSigInput.prototype.addSignature = function(transaction, signature, signingMethod) {
+MultiSigInput.prototype.addSignature = function(transaction, signature) {
   $.checkState(!this.isFullySigned(), 'All needed signatures have already been added');
-  $.checkArgument(!_.isUndefined(this.publicKeyIndex[signature.publicKey.toString()], "Signature Undefined"),
+  $.checkArgument(!_.isUndefined(this.publicKeyIndex[signature.publicKey.toString()]),
     'Signature has no matching public key');
-  $.checkState(this.isValidSignature(transaction, signature, signingMethod), "Invalid Signature");
+  $.checkState(this.isValidSignature(transaction, signature));
   this.signatures[this.publicKeyIndex[signature.publicKey.toString()]] = signature;
   this._updateScript();
   return this;
@@ -112,7 +109,6 @@ MultiSigInput.prototype._updateScript = function() {
 MultiSigInput.prototype._createSignatures = function() {
   return _.map(
     _.filter(this.signatures, function(signature) { return !_.isUndefined(signature); }),
-    // Future signature types may need refactor of toDER
     function(signature) {
       return BufferUtil.concat([
         signature.signature.toDER(),
@@ -148,7 +144,7 @@ MultiSigInput.prototype.publicKeysWithoutSignature = function() {
   });
 };
 
-MultiSigInput.prototype.isValidSignature = function(transaction, signature, signingMethod) {
+MultiSigInput.prototype.isValidSignature = function(transaction, signature) {
   // FIXME: Refactor signature so this is not necessary
   signature.signature.nhashtype = signature.sigtype;
   return Sighash.verify(
@@ -156,8 +152,7 @@ MultiSigInput.prototype.isValidSignature = function(transaction, signature, sign
     signature.signature,
     signature.publicKey,
     signature.inputIndex,
-    this.output.script,
-    signingMethod
+    this.output.script
   );
 };
 
@@ -168,10 +163,9 @@ MultiSigInput.prototype.isValidSignature = function(transaction, signature, sign
  * @param {Transaction} transaction
  * @param {Integer} inputIndex
  * @param {Input} input
- * @param {String} signingMethod - method used to sign - 'ecdsa' or 'schnorr' (future signing method)
  * @returns {TransactionSignature[]}
  */
-MultiSigInput.normalizeSignatures = function(transaction, input, inputIndex, signatures, publicKeys, signingMethod) {
+MultiSigInput.normalizeSignatures = function(transaction, input, inputIndex, signatures, publicKeys) {
   return publicKeys.map(function (pubKey) {
     var signatureMatch = null;
     signatures = signatures.filter(function (signatureBuffer) {
@@ -194,8 +188,7 @@ MultiSigInput.normalizeSignatures = function(transaction, input, inputIndex, sig
           signature.signature,
           signature.publicKey,
           signature.inputIndex,
-          input.output.script,
-          signingMethod
+          input.output.script
       );
 
       if (isMatch) {

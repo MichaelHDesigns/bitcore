@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var should = require('chai').should();
@@ -32,7 +35,7 @@ describe('Base58Check', function() {
   });
 
   describe('#set', function() {
-    
+
     it('should set a buf', function() {
       should.exist(Base58Check().set({buf: buf}).buf);
     });
@@ -83,7 +86,7 @@ describe('Base58Check', function() {
   });
 
   describe('#fromBuffer', function() {
-    
+
     it('should not fail', function() {
       should.exist(Base58Check().fromBuffer(buf));
     });

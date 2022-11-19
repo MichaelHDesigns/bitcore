@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var _ = require('lodash');
@@ -31,7 +34,7 @@ var $ = require('./util/preconditions');
  *
  * @param {string} data - The encoded data in various formats
  * @param {Network|string=} network - a {@link Network} object, or a string with the network name
- * @returns {PrivateKey} A new valid instance of an PrivateKey
+ * @returns {PrivateKey} A new valid instance of a PrivateKey
  * @constructor
  */
 function PrivateKey(data, network) {
@@ -49,7 +52,7 @@ function PrivateKey(data, network) {
 
   // validation
   if (!info.bn || info.bn.cmp(new BN(0)) === 0){
-    throw new TypeError('Number can not be equal to zero, undefined, null or false');
+    throw new TypeError('Number cannot be equal to zero, undefined, null or false');
   }
   if (!info.bn.lt(Point.getN())) {
     throw new TypeError('Number must be less than N');
@@ -336,7 +339,8 @@ PrivateKey.prototype.toBigNumber = function(){
  * @returns {Buffer} A buffer of the private key
  */
 PrivateKey.prototype.toBuffer = function(){
-  return this.bn.toBuffer({size: 32});
+  // TODO: use `return this.bn.toBuffer({ size: 32 })` in v1.0.0
+  return this.bn.toBuffer();
 };
 
 /**
@@ -366,14 +370,13 @@ PrivateKey.prototype.toPublicKey = function(){
 /**
  * Will return an address for the private key
  * @param {Network=} network - optional parameter specifying
- * @param {string} type - Either 'pubkeyhash', 'witnesspubkeyhash', or 'scripthash'
  * the desired network for the address
  *
  * @returns {Address} An address generated from the private key
  */
-PrivateKey.prototype.toAddress = function(network, type) {
+PrivateKey.prototype.toAddress = function(network) {
   var pubkey = this.toPublicKey();
-  return Address.fromPublicKey(pubkey, network || this.network, type);
+  return Address.fromPublicKey(pubkey, network || this.network);
 };
 
 /**

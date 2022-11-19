@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var should = require('chai').should();
@@ -16,7 +19,7 @@ describe('BufferReader', function() {
   });
 
   it('should create a new bufferreader with a buffer', function() {
-    var buf =  Buffer.alloc(0);
+    var buf = Buffer.alloc(0);
     var br = new BufferReader(buf);
     should.exist(br);
     Buffer.isBuffer(br.buf).should.equal(true);
@@ -41,7 +44,7 @@ describe('BufferReader', function() {
   describe('#eof', function() {
 
     it('should return true for a blank br', function() {
-      var br = new BufferReader( Buffer.alloc(0));
+      var br = new BufferReader(Buffer.from([]));
       br.finished().should.equal(true);
     });
 
@@ -50,13 +53,13 @@ describe('BufferReader', function() {
   describe('read', function() {
 
     it('should return the same buffer', function() {
-      var buf =  Buffer.alloc(0);
+      var buf = Buffer.from([0]);
       var br = new BufferReader(buf);
       br.readAll().toString('hex').should.equal(buf.toString('hex'));
     });
 
     it('should return a buffer of this length', function() {
-      var buf =  Buffer.alloc(10);
+      var buf = Buffer.alloc(10);
       buf.fill(0);
       var br = new BufferReader(buf);
       var buf2 = br.read(2);
@@ -66,7 +69,7 @@ describe('BufferReader', function() {
     });
 
     it('should work with 0 length', function() {
-      var buf =  Buffer.alloc(10);
+      var buf = Buffer.alloc(10);
       buf.fill(1);
       var br = new BufferReader(buf);
       var buf2 = br.read(0);
@@ -80,7 +83,7 @@ describe('BufferReader', function() {
   describe('readVarLengthBuffer', function() {
 
     it('returns correct buffer', function() {
-      var buf =  Buffer.from('73010000003766404f00000000b305434f00000000f203' +
+      var buf = Buffer.from('73010000003766404f00000000b305434f00000000f203' +
         '0000f1030000001027000048ee00000064000000004653656520626974636f696' +
         'e2e6f72672f666562323020696620796f7520686176652074726f75626c652063' +
         '6f6e6e656374696e6720616674657220323020466562727561727900473045022' +
@@ -120,7 +123,7 @@ describe('BufferReader', function() {
   describe('#readUInt16BE', function() {
 
     it('should return 1', function() {
-      var buf =  Buffer.alloc(2);
+      var buf = Buffer.alloc(2);
       buf.writeUInt16BE(1, 0);
       var br = new BufferReader(buf);
       br.readUInt16BE().should.equal(1);
@@ -207,7 +210,7 @@ describe('BufferReader', function() {
 
     it('should return 2^32 + 1', function() {
       var num = Math.pow(2, 32) + 1;
-      var numBuffer =  Buffer.from('0100000001000000', 'hex');
+      var numBuffer = Buffer.from('0100000001000000', 'hex');
       var br = new BufferReader(numBuffer);
       br.readUInt64LEBN().toNumber().should.equal(num);
     });
@@ -228,7 +231,7 @@ describe('BufferReader', function() {
 
     it('should return 2^53', function() {
       var bn = new BN('20000000000000', 16);
-      var bnBuffer =  Buffer.from('0000000000002000', 'hex');
+      var bnBuffer = Buffer.from('0000000000002000', 'hex');
       var br = new BufferReader(bnBuffer);
       var readbn = br.readUInt64LEBN();
       readbn.cmp(bn).should.equal(0);

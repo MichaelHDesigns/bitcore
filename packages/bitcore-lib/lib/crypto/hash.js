@@ -1,8 +1,12 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var crypto = require('crypto');
 var BufferUtil = require('../util/buffer');
 var $ = require('../util/preconditions');
+var x25x = require('node-x25x');
 
 var Hash = module.exports;
 
@@ -82,4 +86,9 @@ Hash.sha256hmac = function(data, key) {
 
 Hash.sha512hmac = function(data, key) {
   return Hash.hmac(Hash.sha512, data, key);
+};
+
+Hash.x25x = function(buf) {
+  $.checkArgument(BufferUtil.isBuffer(buf));
+  return BufferUtil.reverse(x25x.x25x(buf));
 };

@@ -1,8 +1,10 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var _ = require('lodash');
 var Base58 = require('./base58');
-var buffer = require('buffer');
 var sha256sha256 = require('../crypto/hash').sha256sha256;
 
 var Base58Check = function Base58Check(obj) {
@@ -29,7 +31,7 @@ Base58Check.validChecksum = function validChecksum(data, checksum) {
     data = Buffer.from(Base58.decode(data));
   }
   if (_.isString(checksum)) {
-    checksum =  Buffer.from(Base58.decode(checksum));
+    checksum = Buffer.from(Base58.decode(checksum));
   }
   if (!checksum) {
     checksum = data.slice(-4);

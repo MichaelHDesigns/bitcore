@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 /* jshint unused: false */
 
@@ -123,6 +126,23 @@ describe('buffer utils', function() {
       expect(BufferUtil.integerFromBuffer(
         BufferUtil.integerAsBuffer(10000)
       )).to.equal(10000);
+    });
+  });
+
+  describe('buffer to hex', function() {
+    it('returns an expected value in hexa', function() {
+      expect(BufferUtil.bufferToHex(Buffer.from([255, 0, 128]))).to.equal('ff0080');
+    });
+    it('checks the argument type', function() {
+      expect(function() {
+        BufferUtil.bufferToHex('invalid');
+      }).to.throw(errors.InvalidArgumentType);
+    });
+    it('round trips', function() {
+      var original = Buffer.from([255, 0, 128]);
+      var hexa = BufferUtil.bufferToHex(original);
+      var back = BufferUtil.hexToBuffer(hexa);
+      expect(BufferUtil.equal(original, back)).to.equal(true);
     });
   });
 

@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 /* jshint unused: false */
 
@@ -15,13 +18,13 @@ var MultiSigInput = bitcore.Transaction.Input.MultiSig;
 
 describe('MultiSigInput', function() {
 
-  var privateKey1 = new PrivateKey('KwF9LjRraetZuEjR8VqEq539z137LW5anYDUnVK11vM3mNMHTWb4');
-  var privateKey2 = new PrivateKey('L4PqnaPTCkYhAqH3YQmefjxQP6zRcF4EJbdGqR8v6adtG9XSsadY');
-  var privateKey3 = new PrivateKey('L4CTX79zFeksZTyyoFuPQAySfmP7fL3R41gWKTuepuN7hxuNuJwV');
+  var privateKey1 = new PrivateKey('Ky27mcY8BC6JUK6Ab1peZGxSpECy2PQevyj1aEd1uDYY5h1ardo6');
+  var privateKey2 = new PrivateKey('Kz66tJZEf9WVXPEGANB9F89SMjAFvuEFPGQnYf7qXdggspGcF3ZZ');
+  var privateKey3 = new PrivateKey('KxGeK6vWPhRnjV4yQjddzc8Y3CabZHLJ6JMjx7mWQMZeZ2mfTsD8');
   var public1 = privateKey1.publicKey;
   var public2 = privateKey2.publicKey;
   var public3 = privateKey3.publicKey;
-  var address = new Address('33zbk2aSZYdNbRsMPPt6jgy6Kq1kQreqeb');
+  var address = new Address('3NfRpFy5Sz9g89kduUZqWUKW6nNQtkhfPn');
 
   var output = {
     txId: '66e64ef8a3b384164b78453fa8c8194de9a473ba14f89485a0e433699daec140',

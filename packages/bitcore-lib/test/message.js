@@ -1,22 +1,24 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
-/* jshint maxstatements: 30 */
-
 var chai = require('chai');
-var should = chai.should();
 var expect = chai.expect;
+var should = chai.should();
 
-var bitcore = require('..');
+var bitcore = require('../.');
 var Address = bitcore.Address;
 var Signature = bitcore.crypto.Signature;
-var Message = require('../lib/message');
+var Message = bitcore.Message;
 
 describe('Message', function() {
-  var address = 'n1ZCYg9YXtB5XCZazLxSmPDa8iwJRZHhGx';
-  var badAddress = 'mmRcrB5fTwgxaFJmVLNtaG8SV454y1E3kC';
-  var privateKey = bitcore.PrivateKey.fromWIF('cPBn5A4ikZvBTQ8D7NnvHZYCAxzDZ5Z2TSGW2LkyPiLxqYaJPBW4');
+
+  var address = 'yZKdLYCvDXa2kyQr8Tg3N6c3xeZoK7XDcj';
+  var badAddress = 'yj3v6A6gQkiRbChbGwvahiFZ6EfpYxk9na';
+  var privateKey = bitcore.PrivateKey.fromWIF('cR4qogdN9UxLZJXCNFNwDRRZNeLRWuds9TTSuLNweFVjiaE4gPaq');
   var text = 'hello, world';
-  var signatureString = 'H/DIn8uA1scAuKLlCx+/9LnAcJtwQQ0PmcPrJUq90aboLv3fH5fFvY+vmbfOSFEtGarznYli6ShPr9RXwY9UrIY=';
+  var signatureString = 'IB+LpNmaTAkB8e6fGgocGKuZ2tAXJ4ZmhhVs7FbOOcHjHPgMHycpAFIl1ojb+PA6jyhufeOKQZKjPnI8VQnevRI=';
 
   var badSignatureString = 'H69qZ4mbZCcvXk7CWjptD5ypnYVLvQ3eMXLM8+1gX21SLH/GaFnAjQrDn37+TDw79i9zHhbiMMwhtvTwnPigZ6k=';
 
@@ -101,15 +103,8 @@ describe('Message', function() {
     verified.should.equal(false);
   });
 
-  it('can recover the public key with address and generated signature string', function() {
-    var message11 = new Message(text);
-    var recoveredPublicKey = message11.recoverPublicKey(address, signature3);
-    should.not.exist(message11.error);
-    recoveredPublicKey.should.equal(publicKey.toString());
-  });
-
   it('will verify with an uncompressed pubkey', function() {
-    var privateKey = new bitcore.PrivateKey('5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss');
+    var privateKey = new bitcore.PrivateKey('67fd2209ce4a95f6f1d421ab3fbea47ada13df11b73b30c4d9a9f78cc80651ac');
     var message = new Message('This is an example of a signed message.');
     var signature = message.sign(privateKey);
     var verified = message.verify(privateKey.toAddress(), signature);
@@ -122,6 +117,7 @@ describe('Message', function() {
   });
 
   describe('#json', function() {
+
     it('roundtrip to-from-to', function() {
       var json = new Message(text).toJSON();
       var message = Message.fromJSON(json);
@@ -133,9 +129,11 @@ describe('Message', function() {
         return Message.fromJSON('¹');
       }).to.throw();
     });
+
   });
 
   describe('#toString', function() {
+
     it('message string', function() {
       var message = new Message(text);
       message.toString().should.equal(text);
@@ -146,18 +144,24 @@ describe('Message', function() {
       var message = Message.fromString(str);
       message.toString().should.equal(text);
     });
+
   });
 
   describe('#inspect', function() {
+
     it('should output formatted output correctly', function() {
       var message = new Message(text);
-      var output = '<Message: ' + text + '>';
+      var output = '<Message: '+text+'>';
       message.inspect().should.equal(output);
     });
+
   });
 
+
   it('accepts Address for verification', function() {
-    var verified = Message(text).verify(new Address(address), signatureString);
+    var verified = Message(text)
+      .verify(new Address(address), signatureString);
     verified.should.equal(true);
   });
+
 });

@@ -1,8 +1,10 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 var _ = require('lodash');
 var BN = require('../crypto/bn');
-var buffer = require('buffer');
 var bufferUtil = require('../util/buffer');
 var JSUtil = require('../util/js');
 var BufferWriter = require('../encoding/bufferwriter');

@@ -1,8 +1,9 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
-
 var assert = require('assert');
-var buffer = require('buffer');
 var _ = require('lodash');
 var $ = require('./util/preconditions');
 
@@ -369,8 +370,8 @@ HDPrivateKey.prototype._buildFromObject = function(arg) {
     depth: _.isNumber(arg.depth) ? BufferUtil.integerAsSingleByteBuffer(arg.depth) : arg.depth,
     parentFingerPrint: _.isNumber(arg.parentFingerPrint) ? BufferUtil.integerAsBuffer(arg.parentFingerPrint) : arg.parentFingerPrint,
     childIndex: _.isNumber(arg.childIndex) ? BufferUtil.integerAsBuffer(arg.childIndex) : arg.childIndex,
-    chainCode: _.isString(arg.chainCode) ? Buffer.from(arg.chainCode,'hex') : arg.chainCode,
-    privateKey: (_.isString(arg.privateKey) && JSUtil.isHexa(arg.privateKey)) ? Buffer.from(arg.privateKey,'hex') : arg.privateKey,
+    chainCode: _.isString(arg.chainCode) ? BufferUtil.hexToBuffer(arg.chainCode) : arg.chainCode,
+    privateKey: (_.isString(arg.privateKey) && JSUtil.isHexa(arg.privateKey)) ? BufferUtil.hexToBuffer(arg.privateKey) : arg.privateKey,
     checksum: arg.checksum ? (arg.checksum.length ? arg.checksum : BufferUtil.integerAsBuffer(arg.checksum)) : undefined
   };
   return this._buildFromBuffers(buffers);
@@ -406,7 +407,7 @@ HDPrivateKey.prototype._generateRandomly = function(network) {
 HDPrivateKey.fromSeed = function(hexa, network) {
   /* jshint maxcomplexity: 8 */
   if (JSUtil.isHexaString(hexa)) {
-    hexa = Buffer.from(hexa, 'hex');
+    hexa = BufferUtil.hexToBuffer(hexa);
   }
   if (!Buffer.isBuffer(hexa)) {
     throw new hdErrors.InvalidEntropyArgument(hexa);
@@ -443,13 +444,13 @@ HDPrivateKey.prototype._calcHDPublicKey = function() {
  * internal structure
  *
  * @param {Object} arg
- * @param {buffer.Buffer} arg.version
- * @param {buffer.Buffer} arg.depth
- * @param {buffer.Buffer} arg.parentFingerPrint
- * @param {buffer.Buffer} arg.childIndex
- * @param {buffer.Buffer} arg.chainCode
- * @param {buffer.Buffer} arg.privateKey
- * @param {buffer.Buffer} arg.checksum
+ * @param {Buffer} arg.version
+ * @param {Buffer} arg.depth
+ * @param {Buffer} arg.parentFingerPrint
+ * @param {Buffer} arg.childIndex
+ * @param {Buffer} arg.chainCode
+ * @param {Buffer} arg.privateKey
+ * @param {Buffer} arg.checksum
  * @param {string=} arg.xprivkey - if set, don't recalculate the base58
  *      representation
  * @return {HDPrivateKey} this
@@ -468,7 +469,7 @@ HDPrivateKey.prototype._buildFromBuffers = function(arg) {
     arg.version, arg.depth, arg.parentFingerPrint, arg.childIndex, arg.chainCode,
     BufferUtil.emptyBuffer(1), arg.privateKey
   ];
-  var concat = buffer.Buffer.concat(sequence);
+  var concat = Buffer.concat(sequence);
   if (!arg.checksum || !arg.checksum.length) {
     arg.checksum = Base58Check.checksum(concat);
   } else {
@@ -479,7 +480,7 @@ HDPrivateKey.prototype._buildFromBuffers = function(arg) {
 
   var network = Network.get(BufferUtil.integerFromBuffer(arg.version));
   var xprivkey;
-  xprivkey = Base58Check.encode(buffer.Buffer.concat(sequence));
+  xprivkey = Base58Check.encode(Buffer.concat(sequence));
   arg.xprivkey = Buffer.from(xprivkey);
 
   var privateKey = new PrivateKey(BN.fromBuffer(arg.privateKey), network);

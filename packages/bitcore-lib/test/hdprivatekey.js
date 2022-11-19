@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 /* jshint unused: false */
 var _ = require('lodash');
@@ -7,7 +10,6 @@ var expect = require('chai').expect;
 var bitcore = require('..');
 var errors = bitcore.errors;
 var hdErrors = errors.HDPrivateKey;
-var buffer = require('buffer');
 var Networks = bitcore.Networks;
 var BufferUtil = bitcore.util.buffer;
 var HDPrivateKey = bitcore.HDPrivateKey;

@@ -1,6 +1,8 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
-var buffer = require('buffer');
 var assert = require('assert');
 
 var js = require('./js');
@@ -57,7 +59,7 @@ module.exports = {
    * @return {boolean}
    */
   isBuffer: function isBuffer(arg) {
-    return buffer.Buffer.isBuffer(arg) || arg instanceof Uint8Array;
+    return Buffer.isBuffer(arg) || arg instanceof Uint8Array;
   },
 
   /**
@@ -78,9 +80,9 @@ module.exports = {
   /**
    * Concatenates a buffer
    *
-   * Shortcut for <tt>buffer.Buffer.concat</tt>
+   * Shortcut for <tt>Buffer.concat</tt>
    */
-  concat: buffer.Buffer.concat,
+  concat: Buffer.concat,
 
   equals: equals,
   equal: equals,
@@ -134,7 +136,7 @@ module.exports = {
   },
 
   /**
-   * Transforms a buffer into a string with a number in hexa representation
+   * Transforms a buffer into a string with a number in hex representation
    *
    * Shorthand for <tt>buffer.toString('hex')</tt>
    *
@@ -152,8 +154,25 @@ module.exports = {
    * @return {Buffer}
    */
   reverse: function reverse(param) {
-    return (Buffer.from(param)).reverse();
+    var ret = Buffer.alloc(param.length);
+    for (var i = 0; i < param.length; i++) {
+      ret[i] = param[param.length - i - 1];
+    }
+    return ret;
   },
+
+  /**
+   * Transforms an hex encoded string into a Buffer with binary values
+   *
+   * Shorthand for <tt>Buffer.from(string, 'hex')</tt>
+   *
+   * @param {string} string
+   * @return {Buffer}
+   */
+  hexToBuffer: function hexToBuffer(string) {
+    assert(js.isHexa(string));
+    return Buffer.from(string, 'hex');
+  }
 };
 
 module.exports.NULL_HASH = module.exports.fill(Buffer.alloc(32), 0);

@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 /* jshint unused: false */
@@ -6,11 +9,9 @@ var assert = require('assert');
 var should = require('chai').should();
 var expect = require('chai').expect;
 var bitcore = require('..');
-var buffer = require('buffer');
 var errors = bitcore.errors;
 var hdErrors = bitcore.errors.HDPublicKey;
 var BufferUtil = bitcore.util.buffer;
-var HDPrivateKey = bitcore.HDPrivateKey;
 var HDPublicKey = bitcore.HDPublicKey;
 var Base58Check = bitcore.encoding.Base58Check;
 var Networks = bitcore.Networks;

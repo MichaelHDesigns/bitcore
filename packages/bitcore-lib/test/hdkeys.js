@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove previous line and work through linting issues at next edit
+
 'use strict';
 
 // Relax some linter options:
@@ -271,17 +274,17 @@ describe('BIP32 compliance', function() {
   });
 
   describe('edge cases', function() {
-    var sandbox = sinon.createSandbox();
+    var sandbox = sinon.sandbox.create();
     afterEach(function() {
       sandbox.restore();
     });
     it('will handle edge case that derived private key is invalid', function() {
-      var invalid =  Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex');
-      var privateKeyBuffer =  Buffer.from('5f72914c48581fc7ddeb944a9616389200a9560177d24f458258e5b04527bcd1', 'hex');
-      var chainCodeBuffer =  Buffer.from('39816057bba9d952fe87fe998b7fd4d690a1bb58c2ff69141469e4d1dffb4b91', 'hex');
+      var invalid = Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex');
+      var privateKeyBuffer = Buffer.from('5f72914c48581fc7ddeb944a9616389200a9560177d24f458258e5b04527bcd1', 'hex');
+      var chainCodeBuffer = Buffer.from('39816057bba9d952fe87fe998b7fd4d690a1bb58c2ff69141469e4d1dffb4b91', 'hex');
       var unstubbed = bitcore.crypto.BN.prototype.toBuffer;
       var count = 0;
-      var stub = sandbox.stub(bitcore.crypto.BN.prototype, 'toBuffer').callsFake(function (args) {
+      var stub = sandbox.stub(bitcore.crypto.BN.prototype, 'toBuffer').callsFake(function(args) {
         // On the fourth call to the function give back an invalid private key
         // otherwise use the normal behavior.
         count++;
